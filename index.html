@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aixact AI – Detect, Verify, Trust</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --accent: #ff4d7e; /* inspired pink */
+        --accent-deep: #c81f5a;
+        --neon: rgba(255,77,126,0.10);
+        --glass-weak: rgba(255,255,255,0.02);
+        --glass-strong: rgba(255,255,255,0.05);
+        --bg-dark: #2b2b2b; /* charcoal outer frame like the mock */
+        --panel-light: #efefef; /* hero / content panel */
+    }
+
+    html { scroll-behavior: smooth; }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Space Grotesk", "Inter", sans-serif;
+    }
+
+    body {
+        background: var(--bg-dark);
+        color: #000;
+        min-height: 100vh;
+    }
+
+    .frame {
+        background: radial-gradient(circle at 20% 0%, var(--bg-dark), #171717 65%);
+        padding: clamp(1.5rem, 3vw, 3rem);
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* faint futuristic grid / scanlines overlay */
+    .frame::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 12px),
+                          repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 24px);
+        opacity: 0.5;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+    }
+
+    /* subtle neon-pink inner border around the whole site, sits before black borders */
+    .frame::after {
+        content: "";
+        position: absolute;
+        inset: 6px; /* keep it inside the outer frame */
+        border-radius: 14px;
+        pointer-events: none;
+        border: 2px solid rgba(255,77,126,0.28);
+        /* tubelight-style outer glow: layered, brighter and wider */
+        box-shadow:
+            0 0 18px rgba(255,77,126,0.20),
+            0 0 48px rgba(255,77,126,0.26),
+            0 0 110px rgba(255,77,126,0.36),
+            0 0 220px rgba(255,77,126,0.18);
+        mix-blend-mode: screen;
+        transition: box-shadow 220ms ease, border-color 220ms ease;
+        animation: pulseNeon 2.6s ease-in-out infinite;
+    }
+
+    @keyframes pulseNeon {
+        0% {
+            border-color: rgba(255,77,126,0.28);
+            box-shadow:
+                0 0 12px rgba(255,77,126,0.10),
+                0 0 36px rgba(255,77,126,0.18),
+                0 0 90px rgba(255,77,126,0.26),
+                0 0 160px rgba(255,77,126,0.12);
+        }
+        50% {
+            border-color: rgba(255,77,126,0.48);
+            box-shadow:
+                0 0 28px rgba(255,77,126,0.20),
+                0 0 80px rgba(255,77,126,0.34),
+                0 0 200px rgba(255,77,126,0.48),
+                0 0 360px rgba(255,77,126,0.22);
+        }
+        100% {
+            border-color: rgba(255,77,126,0.28);
+            box-shadow:
+                0 0 12px rgba(255,77,126,0.10),
+                0 0 36px rgba(255,77,126,0.18),
+                0 0 90px rgba(255,77,126,0.26),
+                0 0 160px rgba(255,77,126,0.12);
+        }
+    }
+
+    .content-wrapper {
+        background: var(--panel-light);
+        padding: clamp(2rem, 4vw, 4rem);
+        min-height: calc(100vh - clamp(3rem, 6vw, 6rem));
+    }
+
+    .layout {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(1.5rem, 3vw, 2.5rem);
+    }
+
+    .top-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 0.6rem 1.5rem;
+        margin-bottom: clamp(0.75rem, 2vw, 1.5rem);
+        border: 2px solid #0b0b0b;
+        border-radius: 18px;
+        background: linear-gradient(90deg, #fefefe, #f4f4f4);
+        position: sticky;
+        top: clamp(1rem, 2vw, 2rem);
+        z-index: 10;
+    }
+
+    .top-nav + .hero { margin-top: clamp(1rem, 2.5vw, 2rem); }
+
+    .brand { display: flex; align-items: center; gap: 0.4rem; }
+
+    .brand-logo {
+        width: 88px;
+        height: 88px;
+        padding: 0;
+        border-radius: 50%;
+        background: #ffffff;
+        object-fit: contain;
+    }
+
+    .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        border: 2px solid rgba(0,0,0,0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        background: #fff;
+        color: #050505;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.12) inset;
+    }
+
+    .brand-text { text-transform: uppercase; letter-spacing: 0.3em; font-size: 0.8rem; }
+
+    .nav { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+
+    .nav button {
+        background: transparent;
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        padding: 0.4rem 1rem;
+        cursor: pointer;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+    }
+
+    .nav button.active {
+        background: #111;
+        color: #ffffff;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.28), 0 0 18px var(--neon);
+        border-color: rgba(255,77,126,0.12);
+    }
+
+    .nav button:hover { color: var(--accent); border-color: rgba(255,77,126,0.12); transform: translateY(-2px); }
+
+    /* nav-social removed per user request */
+
+    /* HERO SECTION */
+    .hero { min-height: clamp(55vh, 70vh, 100vh); background: var(--panel-light); border-radius: 18px; padding: clamp(1.5rem, 3.5vw, 3.5rem); border: 2px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 2rem; position: relative; overflow: hidden; }
+
+    .hero-body { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(220px, 330px); gap: clamp(1.5rem, 5vw, 4rem); }
+
+    .hero-content h1 { font-size: clamp(3rem, 8vw, 5rem); letter-spacing: 0.08em; }
+
+    .hero-content h1 span { position: relative; display: inline-block; }
+
+    .hero-content h1 span::after { content: ""; position: absolute; left: 0; bottom: -0.4rem; height: 9px; width: 100%; background: #0e0e0e; }
+
+    .hero-side { background: #060606; color: #f5f5f5; border-radius: 24px; padding: 1.8rem; border: 1px solid #111; display: flex; flex-direction: column; gap: 1.8rem; position: relative; overflow: hidden; }
+
+    .hero-side::after { content: ""; position: absolute; right: -40%; top: -20%; width: 220px; height: 220px; background: radial-gradient(circle at 30% 30%, rgba(0,209,255,0.06), transparent 40%); filter: blur(18px); pointer-events: none; }
+
+    .cta-btn {
+        width: 120px;
+        height: 120px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 0;
+        background: #111;
+        color: #fff;
+        text-decoration: none;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+        cursor: pointer;
+        align-self: center;
+        box-shadow: 0 18px 40px rgba(0,0,0,0.36);
+        position: relative;
+        transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease, filter 220ms ease;
+    }
+
+    .cta-btn::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,77,126,0);
+        pointer-events: none;
+        transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, opacity 220ms ease;
+        opacity: 0;
+    }
+
+    .cta-btn:hover {
+        transform: scale(1.12);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.44), 0 0 28px rgba(255,77,126,0.08);
+    }
+
+    .cta-btn:hover::after {
+        opacity: 1;
+        border-color: rgba(255,77,126,0.38);
+        box-shadow: 0 0 36px rgba(255,77,126,0.14);
+        transform: scale(1.02);
+    }
+
+    /* FEATURES */
+    /* Use the site panel gray for all sections (avoid black backgrounds) */
+    .section-block { margin-top: clamp(2.5rem, 6vw, 4rem); background: var(--panel-light); border-radius: 18px; border: 1px solid rgba(0,0,0,0.06); padding: clamp(2rem, 5vw, 4rem); color: #111; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+
+    .feature { background: linear-gradient(180deg,#0f0f0f,#090909); padding: 1.2rem; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03); color: #e9e9e9; opacity: 0; transform: translateY(20px); transition: 0.25s ease-out; }
+
+    .feature.visible { opacity: 1; transform: translateY(0); }
+
+    .feature:hover { box-shadow: 0 18px 40px rgba(0,0,0,0.36); transform: translateY(-6px); }
+
+    /* TEAM */
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+
+    .team-card {
+        background: linear-gradient(180deg,#0f0f0f,#090909);
+        padding: 1.4rem;
+        border-radius: 16px;
+        color: #e9e9e9;
+        border: 1px solid rgba(255,255,255,0.03);
+        box-shadow: 0 18px 40px rgba(0,0,0,0.45), 0 0 18px rgba(0,0,0,0.02) inset;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .team-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.52); }
+
+    /* Section description spacing — adds breathing room above grids/cards */
+    .section-desc { margin-top: 0.5rem; margin-bottom: 1.25rem; color: #5c5c5c; line-height: 1.4; }
+
+    /* Ensure headings have breathing room from the content that follows */
+    .section-title {
+        margin: 0 0 0.75rem 0;
+        font-size: 1.4rem;
+        color: #111;
+    }
+
+    /* Extra spacing for the immediate content container under a section */
+    .section-block > *:not(.section-title) {
+        margin-top: 0.75rem;
+    }
+
+    /* CONTACT */
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+
+    /* Contact form controls — improved visual design */
+    .contact-card form { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem; }
+
+    .contact-card form input, .contact-card form textarea { width: 100%; padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid #d6d6d6; background: #ffffff; color: #0b0b0b; font-size: 0.95rem; line-height: 1.3; transition: box-shadow 0.15s ease, border-color 0.12s ease, transform 0.06s ease; }
+
+    .contact-card form input::placeholder, .contact-card form textarea::placeholder { color: #9ea6aa; }
+
+    .contact-card form input:focus, .contact-card form textarea:focus { outline: none; border-color: #0e0e0e; box-shadow: 0 10px 30px rgba(14,14,14,0.06); transform: translateY(-1px); }
+
+    .contact-card form textarea { min-height: 120px; resize: vertical; }
+
+    .contact-card form button { padding: 0.6rem 1rem; background: #0e0e0e; color: #ffffff; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; align-self: flex-start; transition: background 0.12s ease, transform 0.08s ease; }
+
+    .contact-card form button:hover { background: #111111; transform: translateY(-2px); }
+
+    .contact-card form button:active { transform: translateY(0); }
+
+    @media (max-width: 900px) {
+        .top-nav { flex-direction: column; position: static; }
+        .nav { justify-content: flex-start; }
+    }
+
+    /* Back to top button */
+    #back-to-top {
+        position: fixed;
+        right: clamp(0.9rem, 2vw, 1.5rem);
+        bottom: clamp(0.9rem, 2vw, 1.5rem);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 0;
+        background: #111;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.36);
+        cursor: pointer;
+        z-index: 1200;
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+        transition: opacity 200ms ease, transform 200ms cubic-bezier(.2,.9,.2,1);
+    }
+
+    #back-to-top.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    #back-to-top:focus { outline: 3px solid rgba(255,77,126,0.16); }
+
+    /* Analytics cards shown on the first page (hero) */
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+
+    .analytics-card { background: linear-gradient(180deg,#0f0f0f,#0b0b0b); color: #fff; padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); box-shadow: 0 14px 36px rgba(0,0,0,0.45); text-align: center; }
+
+    .analytics-card h4 { margin: 0 0 0.35rem 0; font-size: 0.9rem; color: #dcdcdc; font-weight: 600; }
+
+    .analytics-card .stat { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+
+    .analytics-card .label { font-size: 0.78rem; color: #bcbcbc; margin-top: 0.35rem; }
+
+    /* Report and contact cards should also use the black card background for consistency */
+    .report-card { background: var(--panel-light); color: #111; padding: 1rem; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+
+    /* Contact card: use the panel gray but with black border as requested */
+    .contact-card { background: var(--panel-light); color: #111; padding: 1rem; border-radius: 12px; border: 1px solid #0b0b0b; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+
+    .report-card h3 { color: #111; }
+    .contact-card h3 { color: #111; }
+</style>
+</head>
+
+<body>
+
+<div class="frame">
+    <div class="content-wrapper">
+        <div class="layout">
+
+            <header class="top-nav">
+                <div class="brand">
+                    <img src="AIXACT-removebg-preview (1).png" alt="Aixact logo" class="brand-logo">
+                    <div class="brand-text">Aixact</div>
+                </div>
+
+                <nav class="nav">
+                    <button class="active" data-target="#overview">Dashboard</button>
+                    <button data-target="#features">Features</button>
+                    <button data-target="#team">Team</button>
+                    <button data-target="#reports">Reports</button>
+                    <button data-target="#contact">Contact</button>
+                </nav>
+
+                
+            </header>
+
+            <!-- HERO SECTION -->
+            <section class="hero" id="overview">
+                <!-- page-tabs removed as requested -->
+
+                <div class="hero-body">
+                    <div class="hero-content">
+                        <p class="hero-label">Misinformation Intelligence</p>
+                        <h1>Detect,<br><span>Verify</span>,<br>Trust</h1>
+                        <p>
+                            Aixact AI analyzes documents, articles, links, images, and social posts to expose misinformation in real-time—
+                            delivering credibility scores and evidence-backed context.
+                        </p>
+                    </div>
+
+                    <div class="hero-side">
+                        <a class="cta-btn" href="search.html">Get<br>Started</a>
+
+                        <div class="metrics">
+                            <div class="metric"><strong>14ms</strong><span>response time</span></div>
+                            <div class="metric"><strong>5 formats</strong><span>scanned live</span></div>
+                            <div class="metric"><strong>99.1%</strong><span>precision</span></div>
+                        </div>
+
+                        <div class="side-note">
+                            <strong>Network Pulse</strong>
+                            Cross-checks 18 fact sources and 42M archived stories per day.
+                        </div>
+                    </div>
+                </div>
+                <!-- Analytics cards for overview -->
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h4>Throughput</h4>
+                        <div class="stat">2.4k req/min</div>
+                        <div class="label">average</div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h4>Avg Latency</h4>
+                        <div class="stat">14 ms</div>
+                        <div class="label">p95</div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h4>Documents/day</h4>
+                        <div class="stat">42M</div>
+                        <div class="label">processed</div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h4>Precision</h4>
+                        <div class="stat">99.1%</div>
+                        <div class="label">model avg</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FEATURES -->
+            <section class="section-block" id="features">
+                <h2 class="section-title">Features</h2>
+                <p class="section-desc">Multi-format detection through one API.</p>
+
+                <div class="features-grid">
+                    <div class="feature">
+                        <div class="feature-icon">⟲</div>
+                        <h3>Real-Time Fact Checking</h3>
+                        <p>Detects misleading claims instantly.</p>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon">◎</div>
+                        <h3>Source Reliability</h3>
+                        <p>Rates journalists and publishers.</p>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon">▢</div>
+                        <h3>Multi-Format Analysis</h3>
+                        <p>PDFs, images, videos, posts.</p>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon">!</div>
+                        <h3>Misinformation Alerts</h3>
+                        <p>Flags risky content automatically.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TEAM -->
+            <section class="section-block" id="team">
+                <h2 class="section-title">Team</h2>
+                <p class="section-desc">Built by experts in verification and AI systems.</p>
+
+                <div class="team-grid">
+                    <div class="team-card">
+                        <span>Frontend</span>
+                        <h3>Shreya Srivastava</h3>
+                        <p>Frontend engineer building responsive, accessible interfaces.</p>
+                    </div>
+
+                    <div class="team-card">
+                        <span>Backend</span>
+                        <h3>Srawan Pandey</h3>
+                        <p>Backend engineer focused on APIs, reliability, and scaling.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- REPORTS -->
+            <section class="section-block" id="reports">
+                <h2 class="section-title">Reports & Insights</h2>
+
+                <div class="report-grid">
+                    <div class="report-card">
+                        <span class="badge">Live</span>
+                        <h3>Credibility Timeline</h3>
+                        <p>Track misinformation spikes.</p>
+                    </div>
+
+                    <div class="report-card">
+                        <span class="badge">API</span>
+                        <h3>Source Heatmaps</h3>
+                        <p>Visualize trust signals.</p>
+                    </div>
+
+                    <div class="report-card">
+                        <span class="badge">Export</span>
+                        <h3>Audit Trails</h3>
+                        <p>PDF logs for compliance.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTACT -->
+            <section class="section-block" id="contact">
+                <h2 class="section-title">Contact</h2>
+
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <h3>Write to us</h3>
+                        <form id="contact-form">
+                            <input id="contact-name" type="text" placeholder="Full name">
+                            <input id="contact-email" type="email" placeholder="Work email">
+                            <textarea id="contact-message" placeholder="Tell us about your use case"></textarea>
+                            <button id="contact-submit" type="submit">Send</button>
+                            <div id="contact-status" aria-live="polite" style="margin-top:0.5rem;font-size:0.85rem;color:#333;"></div>
+                        </form>
+                    </div>
+
+                    <div class="contact-card">
+                        <h3>Visit</h3>
+                        <p>Bangalore, India</p>
+
+                        <h3 style="margin-top:1.5rem;">Press & Partnerships</h3>
+                        <p>srawanp14@gmail.com<br>shreyasrivastava090807@gmail.com</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const navButtons = document.querySelectorAll('.nav button');
+    const featureCards = document.querySelectorAll('.feature');
+    const tabLinks = document.querySelectorAll('.page-tabs a');
+    const contactForm = document.getElementById('contact-form');
+    const contactName = document.getElementById('contact-name');
+    const contactEmail = document.getElementById('contact-email');
+    const contactMessage = document.getElementById('contact-message');
+    const contactStatus = document.getElementById('contact-status');
+
+    // Smooth scroll helper using requestAnimationFrame for consistent animation
+    function smoothScrollTo(to, duration = 600) {
+        const start = window.scrollY || window.pageYOffset;
+        const diff = to - start;
+        let startTime = null;
+
+        function easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        function step(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const time = Math.min(1, (timestamp - startTime) / duration);
+            const eased = easeInOutCubic(time);
+            window.scrollTo(0, Math.round(start + diff * eased));
+            if (time < 1) requestAnimationFrame(step);
+        }
+
+        requestAnimationFrame(step);
+    }
+    // create back-to-top button element if not present
+    (function(){
+        if (!document.getElementById('back-to-top')) {
+            const b = document.createElement('button');
+            b.id = 'back-to-top';
+            b.setAttribute('aria-label','Back to top');
+            b.innerHTML = '▲';
+            document.body.appendChild(b);
+        }
+    })();
+    function scrollToElement(el) {
+        if (!el) return;
+        const nav = document.querySelector('.top-nav');
+        const navHeight = nav ? nav.getBoundingClientRect().height : 0;
+        const offset = Math.round(navHeight + 12); // small gap under sticky nav
+        const rect = el.getBoundingClientRect();
+        const targetY = window.scrollY + rect.top - offset;
+        smoothScrollTo(targetY, 620);
+    }
+
+    navButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            navButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const target = btn.dataset.target;
+            if (target) {
+                const el = document.querySelector(target);
+                if (el) scrollToElement(el);
+            }
+        });
+    });
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    featureCards.forEach(card => observer.observe(card));
+
+    // Removed mousemove parallax to avoid shaking. Hover scale/shine is handled in CSS now.
+
+    tabLinks.forEach(l => {
+        l.addEventListener('click', () => {
+            tabLinks.forEach(t => t.classList.remove('active'));
+            l.classList.add('active');
+        });
+    });
+
+    // Contact form submission handler
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = contactName.value.trim();
+            const email = contactEmail.value.trim();
+            const message = contactMessage.value.trim();
+
+            if (!email || !message) {
+                if (contactStatus) contactStatus.textContent = 'Please enter your email and a message.';
+                return;
+            }
+
+            if (contactStatus) {
+                contactStatus.style.color = '#333';
+                contactStatus.textContent = 'Sending…';
+            }
+
+            try {
+                const resp = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, message })
+                });
+                const data = await resp.json().catch(() => ({}));
+                if (!resp.ok || data.error) {
+                    throw new Error(data.error || 'Failed to send message');
+                }
+                contactForm.reset();
+                if (contactStatus) {
+                    contactStatus.style.color = 'green';
+                    contactStatus.textContent = 'Message sent successfully.';
+                }
+            } catch (err) {
+                if (contactStatus) {
+                    contactStatus.style.color = '#c81f5a';
+                    contactStatus.textContent = 'Could not send message. Please try again later.';
+                }
+                console.error('Contact form error', err);
+            }
+        });
+    }
+
+    /* Back-to-top button behavior */
+    const backBtn = document.getElementById('back-to-top');
+    if (backBtn) {
+        let rafPending = false;
+        function checkScroll() {
+            if (rafPending) return;
+            rafPending = true;
+            requestAnimationFrame(() => {
+                const show = window.scrollY > 320;
+                backBtn.classList.toggle('show', show);
+                rafPending = false;
+            });
+        }
+
+        window.addEventListener('scroll', checkScroll, { passive: true });
+        // initial state
+        checkScroll();
+
+        backBtn.addEventListener('click', () => {
+            smoothScrollTo(0, 650);
+            backBtn.blur();
+        });
+    }
+</script>
+
+</body>
+</html>

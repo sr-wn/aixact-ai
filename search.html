@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aixact AI – Intelligence Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #ff4d7e;
+            --accent-deep: #c81f5a;
+            --bg-dark: #101010;
+            --panel: #f4f4f4;
+            --ink: #050505;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Space Grotesk", "Inter", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 25% -20%, rgba(255,77,126,0.18), transparent 32%), #050505;
+            color: var(--ink);
+            padding: clamp(1rem, 2vw, 2rem);
+        }
+
+        .frame {
+            background: #1a1a1a;
+            border-radius: 32px;
+            border: 2px solid rgba(255,255,255,0.04);
+            min-height: calc(100vh - clamp(2rem, 4vw, 4rem));
+            padding: clamp(1rem, 2vw, 2rem);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .frame::after {
+            content: "";
+            position: absolute;
+            inset: 10px;
+            border-radius: 24px;
+            border: 1px solid rgba(255,77,126,0.25);
+            pointer-events: none;
+            box-shadow: 0 0 50px rgba(255,77,126,0.35);
+        }
+
+        .content-wrapper {
+            background: var(--panel);
+            border-radius: 22px;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: clamp(1.5rem, 3vw, 3rem);
+        }
+
+        .top-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border: 2px solid #0b0b0b;
+            border-radius: 18px;
+            background: linear-gradient(125deg,#fefefe,#f5f5f5);
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .brand span:first-child {
+            letter-spacing: 0.35em;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .brand span:last-child {
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        .brand-horizontal {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .brand-logo {
+            width: 96px;
+            height: 96px;
+            padding: 0;
+            border-radius: 50%;
+            background: #ffffff;
+            object-fit: contain;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        nav button {
+            border: 1px solid rgba(0,0,0,0.12);
+            border-radius: 999px;
+            padding: 0.4rem 0.95rem;
+            background: transparent;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: border 0.2s ease, transform 0.12s ease, color 0.2s ease;
+        }
+
+        nav button.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+        }
+
+        nav button:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+        .home-link {
+            border: 1px solid rgba(0,0,0,0.16);
+            border-radius: 999px;
+            padding: 0.35rem 1rem;
+            text-decoration: none;
+            color: #050505;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        .home-link:hover { border-color: var(--accent); color: var(--accent); }
+
+        section {
+            margin-top: clamp(2.5rem, 6vw, 4rem);
+        }
+
+        /* make the overview/console/insights/faq panels feel like main page section-blocks */
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(260px, 1.2fr) minmax(220px, 0.8fr);
+            gap: clamp(1rem, 3vw, 2.5rem);
+            background: #ffffff;
+            border-radius: 22px;
+            border: 1px solid rgba(0,0,0,0.06);
+            padding: clamp(1.5rem, 4vw, 3rem);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.6rem, 6vw, 4.5rem);
+            letter-spacing: 0.08em;
+        }
+
+        .hero .lede {
+            margin-top: 1rem;
+            line-height: 1.55;
+            color: #4a4a4a;
+        }
+
+        .hero-panel {
+            background: #080808;
+            border-radius: 20px;
+            padding: 1.5rem;
+            color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .hero-panel .pulse {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.78rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .hero-panel .pulse::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 12px rgba(255,77,126,0.6);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.9rem;
+        }
+
+        .metric {
+            background: linear-gradient(180deg,#101010,#050505);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 0.9rem;
+            text-align: center;
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 1.3rem;
+            letter-spacing: 0.08em;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(240px, 300px) 1fr;
+            gap: clamp(1rem, 3vw, 2.5rem);
+        }
+
+        /* console / insights / faq panels styled like main page cards */
+        #console,
+        #insights,
+        #faq {
+            background: #ffffff;
+            border-radius: 22px;
+            border: 1px solid rgba(0,0,0,0.06);
+            padding: clamp(1.6rem, 3.5vw, 3rem);
+        }
+
+        @media (max-width: 980px) {
+            .hero { grid-template-columns: 1fr; }
+            .workspace { grid-template-columns: 1fr; }
+            .top-nav { position: static; }
+        }
+
+        .history-panel {
+            background: #fff;
+            border-radius: 18px;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-header h3 { letter-spacing: 0.06em; }
+
+        .history-header button {
+            border: none;
+            background: transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.7rem;
+            color: rgba(0,0,0,0.55);
+            cursor: pointer;
+        }
+
+        .history-header button:hover { color: var(--accent); }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .history-entry {
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 14px;
+            padding: 0.7rem 0.9rem;
+            background: #fafafa;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            transition: border 0.2s ease, transform 0.12s ease;
+        }
+
+        .history-entry:hover { border-color: var(--accent); transform: translateX(2px); }
+        .history-entry span { font-size: 0.78rem; color: rgba(0,0,0,0.55); }
+        .history-empty { text-align: center; color: rgba(0,0,0,0.45); }
+
+        .console {
+            background: #050505;
+            color: #f5f5f5;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: clamp(1.25rem, 4vw, 2.25rem);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .console h2 { font-size: 2rem; letter-spacing: 0.04em; }
+
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .search-row input {
+            flex: 1;
+            min-width: 260px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            padding: 0.85rem 1rem;
+            font-size: 1rem;
+        }
+
+        .search-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255,77,126,0.2);
+        }
+
+        .search-row button {
+            border: none;
+            border-radius: 12px;
+            padding: 0.95rem 1.8rem;
+            background: var(--accent);
+            color: #fff;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .search-row button:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(255,77,126,0.35); }
+        .results {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            min-height: 190px;
+            padding: 1rem;
+            line-height: 1.55;
+            color: rgba(255,255,255,0.78);
+        }
+
+        .verdict {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            font-size: 1.4rem;
+        }
+
+        .verdict .score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .scoreboard {
+            margin-top: 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+        }
+
+        .score-row span:last-child {
+            font-family: "Space Grotesk", monospace;
+        }
+
+        .result-meta {
+            margin-top: 0.9rem;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .result-expl {
+            margin-top: 0.75rem;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.82);
+        }
+
+        .result-evidence {
+            margin-top: 0.9rem;
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 0.85rem 1rem;
+        }
+
+        .result-evidence h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .result-evidence ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .result-evidence li {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.82);
+        }
+
+        .result-evidence a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .result-evidence .badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 999px;
+            padding: 0.05rem 0.4rem;
+            margin-right: 0.35rem;
+        }
+
+        .error-state {
+            color: #ff7171;
+            font-weight: 600;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .insight-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .insight-card .label {
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(0,0,0,0.45);
+        }
+
+        .insight-card strong {
+            font-size: 2rem;
+            letter-spacing: 0.08em;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .faq-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid rgba(0,0,0,0.06);
+            padding: 1rem;
+        }
+
+        .faq-card h3 { margin-bottom: 0.5rem; }
+
+        footer {
+            margin-top: 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem;
+            color: rgba(0,0,0,0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="frame">
+        <div class="content-wrapper">
+            <header class="top-nav">
+                <div class="brand-horizontal">
+                    <img src="AIXACT-removebg-preview (1).png" alt="Aixact logo" class="brand-logo">
+                    <div class="brand-stack">
+                        <span>Intelligence</span>
+                        <span>Aixact AI Console</span>
+                    </div>
+                </div>
+                <nav>
+                    <button class="active" data-target="#overview">Overview</button>
+                    <button data-target="#console">Console</button>
+                    <button data-target="#insights">Insights</button>
+                    <button data-target="#faq">FAQ</button>
+                </nav>
+                <a class="home-link" href="index.html">Back to site</a>
+            </header>
+
+            <section class="hero" id="overview">
+                <div>
+                    <p class="hero-label">Realtime Verification Workspace</p>
+                    <h1>Investigate signals, surface truth.</h1>
+                    <p class="lede">
+                        Paste disputed claims, URLs, or paragraphs and watch Aixact AI triangulate authenticity
+                        across trusted archives, social feeds, and forensic detectors.
+                    </p>
+                </div>
+                <div class="hero-panel">
+                    <span class="pulse">Live telemetry</span>
+                    <div class="metrics">
+                        <div class="metric">
+                            <strong>12ms</strong>
+                            <span>avg latency</span>
+                        </div>
+                        <div class="metric">
+                            <strong>3.1k</strong>
+                            <span>req/min</span>
+                        </div>
+                        <div class="metric">
+                            <strong>98.9%</strong>
+                            <span>verified claims</span>
+                        </div>
+                    </div>
+                    <small style="color:#bcbcbc;">Telemetry updates every 30 seconds from production edges.</small>
+                </div>
+            </section>
+
+            <section id="console">
+                <div class="workspace">
+                    <aside class="history-panel" aria-label="Search history">
+                        <div class="history-header">
+                            <h3>Recent Searches</h3>
+                            <button id="clear-history" type="button">Clear</button>
+                        </div>
+                        <ul class="history-list" id="history-list">
+                            <li class="history-empty">No searches yet.</li>
+                        </ul>
+                    </aside>
+
+                    <div class="console" aria-label="AI search console">
+                        <h2>Check any document, article, or post</h2>
+                        <div class="search-row">
+                            <input id="search-input" type="text" placeholder="Paste a link, claim, or paragraph…" aria-label="Fact to analyze">
+                            <button id="search-btn">Analyze</button>
+                        </div>
+                        <div class="results" id="results">
+                            Enter a claim above to see the AI verdict, credibility score, and supporting evidence.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="insights">
+                <h2>Signal snapshots</h2>
+                <p class="section-desc">Automated summaries from your last batch.</p>
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <span class="label">Top verdict</span>
+                        <strong>Credible</strong>
+                        <p>72% of evaluated claims matched corroborated sources.</p>
+                    </div>
+                    <div class="insight-card">
+                        <span class="label">Risk radar</span>
+                        <strong>12</strong>
+                        <p>Emerging narratives flagged for manual review.</p>
+                    </div>
+                    <div class="insight-card">
+                        <span class="label">Source overlap</span>
+                        <strong>41%</strong>
+                        <p>Queries cross-referenced across at least 3 fact archives.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="faq">
+                <h2>Operational FAQ</h2>
+                <div class="faq-grid">
+                    <article class="faq-card">
+                        <h3>How do I connect my dataset?</h3>
+                        <p>Use the `/v2/claims/import` endpoint to stream proprietary corpora for co-analysis.</p>
+                    </article>
+                    <article class="faq-card">
+                        <h3>Can I export audit trails?</h3>
+                        <p>Yes. Every query logs a SHA-linked PDF and JSON bundle for regulators.</p>
+                    </article>
+                    <article class="faq-card">
+                        <h3>Where is data stored?</h3>
+                        <p>All telemetry remains in your tenant’s region with zero retention past 30 days unless pinned.</p>
+                    </article>
+                </div>
+            </section>
+
+            <footer>
+                <span>© Aixact AI · Verification Network</span>
+                <span>press@aixact.ai · partners@aixact.ai</span>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const navButtons = document.querySelectorAll('nav button');
+        const input = document.getElementById('search-input');
+        const results = document.getElementById('results');
+        const historyList = document.getElementById('history-list');
+        const clearBtn = document.getElementById('clear-history');
+        const HISTORY_KEY = 'aixact-history';
+        const MAX_ENTRIES = 8;
+        const API_ENDPOINT = '/api/analyze';
+
+        document.getElementById('search-btn').addEventListener('click', () => handleSearch());
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+            }
+        });
+        clearBtn.addEventListener('click', clearHistory);
+        historyList.addEventListener('click', (e) => {
+            const entry = e.target.closest('.history-entry');
+            if (!entry) return;
+            input.value = entry.dataset.query ? decodeURIComponent(entry.dataset.query) : '';
+            input.focus();
+        });
+
+        function smoothScrollTo(to, duration = 600) {
+            const start = window.scrollY || window.pageYOffset;
+            const diff = to - start;
+            let startTime = null;
+
+            function easeInOutCubic(t) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            }
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const time = Math.min(1, (timestamp - startTime) / duration);
+                const eased = easeInOutCubic(time);
+                window.scrollTo(0, Math.round(start + diff * eased));
+                if (time < 1) requestAnimationFrame(step);
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        function scrollToSection(target) {
+            if (!target) return;
+            const nav = document.querySelector('.top-nav');
+            const navHeight = nav ? nav.getBoundingClientRect().height : 0;
+            const rect = target.getBoundingClientRect();
+            const offset = window.scrollY + rect.top - navHeight - 16;
+            smoothScrollTo(offset, 620);
+        }
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const target = document.querySelector(btn.dataset.target);
+                scrollToSection(target);
+            });
+        });
+
+        let history = loadHistory();
+        renderHistory();
+
+        async function handleSearch() {
+            const query = input.value.trim();
+            if (!query) {
+                results.textContent = 'Please enter a claim or link to analyze.';
+                return;
+            }
+            results.innerHTML = `<div>Evaluating <strong>${escapeHTML(query)}</strong>…</div>`;
+            try {
+                const inference = await fetchInference(query);
+                addToHistory(query);
+                renderVerdict(query, inference);
+            } catch (err) {
+                console.error(err);
+                results.innerHTML = `<div class="error-state">Inference failed: ${escapeHTML(handleFetchError(err))}</div>`;
+            }
+        }
+
+        function addToHistory(query) {
+            history = [{ query, timestamp: Date.now() }, ...history.filter(item => item.query !== query)].slice(0, MAX_ENTRIES);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (!history.length) {
+                historyList.innerHTML = '<li class="history-empty">No searches yet.</li>';
+                return;
+            }
+            historyList.innerHTML = history.map(item => {
+                const safeQuery = escapeHTML(item.query);
+                const encodedQuery = encodeURIComponent(item.query);
+                const time = new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <li>
+                        <button class="history-entry" type="button" data-query="${encodedQuery}">
+                            <strong>${safeQuery}</strong>
+                            <span>${time}</span>
+                        </button>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function clearHistory() {
+            history = [];
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
+        }
+
+        function loadHistory() {
+            try {
+                const data = localStorage.getItem(HISTORY_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (err) {
+                console.error('Failed to load history', err);
+                return [];
+            }
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, (char) => {
+                const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+                return map[char] || char;
+            });
+        }
+        async function fetchInference(query) {
+            const response = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            let payload;
+            try {
+                payload = await response.json();
+            } catch (err) {
+                throw new Error('Invalid response from inference server.');
+            }
+            if (!response.ok) {
+                throw new Error(payload?.error || `HTTP ${response.status}`);
+            }
+            return payload;
+        }
+
+        function renderVerdict(query, data) {
+            // Prefer the new calibrated fields from the Node pipeline, but keep
+            // backwards compatibility with older responses.
+
+            const primary = Array.isArray(data.claims) && data.claims.length
+                ? data.claims[0]
+                : null;
+
+            const verdict = data.final_verdict || data.verdict || primary?.verdict || 'NEEDS VERIFICATION';
+            const confidence = typeof data.final_confidence === 'number'
+                ? data.final_confidence
+                : (typeof data.confidence === 'number' ? data.confidence : null);
+            const pct = confidence != null ? (confidence * 100).toFixed(1) : null;
+
+            const explanationText = data.reasoning || data.explanation || primary?.explanation || '';
+            const explanationHtml = explanationText
+                ? `<p class="result-expl">${escapeHTML(explanationText)}</p>`
+                : '';
+
+            // Evidence: use claim.evidence if present; fall back to citations; last resort meta.evidence
+            let evidenceArray = [];
+            if (primary && Array.isArray(primary.evidence) && primary.evidence.length) {
+                evidenceArray = primary.evidence.map((item) => ({
+                    title: item.title || item.source || item.url || 'Source',
+                    url: item.url || '',
+                    summary: item.summary || item.snippet || '',
+                    verdict: item.stance || item.verdict || 'evidence'
+                }));
+            } else if (Array.isArray(data.citations) && data.citations.length) {
+                evidenceArray = data.citations.map((c) => ({
+                    title: c.title || c.source || c.url || 'Source',
+                    url: c.url || '',
+                    summary: '',
+                    verdict: 'evidence'
+                }));
+            } else if (Array.isArray(data.meta?.externalEvidence)) {
+                evidenceArray = data.meta.externalEvidence.map((e) => ({
+                    title: e.title || e.source || e.url || 'Source',
+                    url: e.url || '',
+                    summary: e.summary || '',
+                    verdict: 'evidence'
+                }));
+            }
+
+            const safeVerdict = escapeHTML(verdict || 'Unknown');
+            const metaLine = buildMetaLine(query, data.meta);
+            const evidenceBlock = buildEvidenceBlock(evidenceArray);
+
+            results.innerHTML = `
+                <div class="verdict">
+                    <span>Verdict:</span>
+                    <span class="score">${safeVerdict}${pct ? ` (${pct}%)` : ''}</span>
+                </div>
+                ${explanationHtml}
+                ${evidenceBlock}
+                <div class="result-meta">
+                    Model: ${escapeHTML(data.model || 'FreeFactChecker')} · ${metaLine}
+                </div>
+            `;
+        }
+
+        function buildMetaLine(query, meta = {}) {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            if (meta.source === 'url' && meta.url) {
+                const note = meta.note ? ` (${escapeHTML(meta.note)})` : '';
+                return `Fetched from <a href="${encodeURI(meta.url)}" target="_blank" rel="noopener">${escapeHTML(meta.url)}</a>${note} · ${time}`;
+            }
+            return `Input: ${escapeHTML(query)} · ${time}`;
+        }
+
+        function handleFetchError(err) {
+            const message = err?.message || 'Unknown error';
+            if (message.includes('site blocked automated access')) {
+                return 'The site blocked automated access. Try another link or copy the article text.';
+            }
+            if (message.includes('Failed to fetch URL') || message.includes('Could not extract readable text')) {
+                return 'We could not read that page. Try another link or paste the text directly.';
+            }
+            return message;
+        }
+
+        function buildEvidenceBlock(evidence = []) {
+            if (!Array.isArray(evidence) || evidence.length === 0) {
+                return '';
+            }
+
+            const items = evidence.map((e) => {
+                const title = escapeHTML(e.title || e.source || 'Source');
+                const verdict = (e.verdict || e.stance || '').toString().toUpperCase() || 'EVIDENCE';
+                const url = e.url || e.link;
+                const safeUrl = url ? escapeHTML(url) : '';
+                const urlHtml = url ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>` : '';
+                const summary = e.summary || e.snippet || '';
+                const summaryHtml = summary ? `<div class="evidence-snippet">${escapeHTML(summary)}</div>` : '';
+
+                return `
+                    <div class="evidence-item">
+                        <span class="evidence-source">${title}</span>
+                        <span class="evidence-tag">${escapeHTML(verdict)}</span>
+                        ${summaryHtml}
+                        ${urlHtml}
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="evidence-block">
+                    <h3>Evidence Sources</h3>
+                    ${items}
+                </div>
+            `;
+        }
+            async function fetchInference(query) {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                let payload;
+                try {
+                    payload = await response.json();
+                } catch (err) {
+                    throw new Error('Invalid response from inference server.');
+                }
+                if (!response.ok) {
+                    throw new Error(payload?.error || `HTTP ${response.status}`);
+                }
+                return payload;
+            }
+
+            function renderVerdict(query, data) {
+                // Prefer the new calibrated fields from the Node pipeline, but keep
+                // backwards compatibility with older responses.
+
+                const primary = Array.isArray(data.claims) && data.claims.length
+                    ? data.claims[0]
+                    : null;
+
+                const verdict = data.final_verdict || data.verdict || primary?.verdict || 'NEEDS VERIFICATION';
+                const confidence = typeof data.final_confidence === 'number'
+                    ? data.final_confidence
+                    : (typeof data.confidence === 'number' ? data.confidence : null);
+                const pct = confidence != null ? (confidence * 100).toFixed(1) : null;
+
+                const explanationText = data.reasoning || data.explanation || primary?.explanation || '';
+                const explanationHtml = explanationText
+                    ? `<p class="result-expl">${escapeHTML(explanationText)}</p>`
+                    : '';
+
+                // Evidence: use claim.evidence if present; fall back to citations; last resort meta.evidence
+                let evidenceArray = [];
+                if (primary && Array.isArray(primary.evidence) && primary.evidence.length) {
+                    evidenceArray = primary.evidence.map((item) => ({
+                        title: item.title || item.source || item.url || 'Source',
+                        url: item.url || '',
+                        summary: item.summary || item.snippet || '',
+                        verdict: item.stance || item.verdict || 'evidence'
+                    }));
+                } else if (Array.isArray(data.citations) && data.citations.length) {
+                    evidenceArray = data.citations.map((c) => ({
+                        title: c.title || c.source || c.url || 'Source',
+                        url: c.url || '',
+                        summary: '',
+                        verdict: 'evidence'
+                    }));
+                } else if (Array.isArray(data.meta?.externalEvidence)) {
+                    evidenceArray = data.meta.externalEvidence.map((e) => ({
+                        title: e.title || e.source || e.url || 'Source',
+                        url: e.url || '',
+                        summary: e.summary || '',
+                        verdict: 'evidence'
+                    }));
+                }
+
+                const safeVerdict = escapeHTML(verdict || 'Unknown');
+                const metaLine = buildMetaLine(query, data.meta);
+                const evidenceBlock = buildEvidenceBlock(evidenceArray);
+
+                results.innerHTML = `
+                    <div class="verdict">
+                        <span>Verdict:</span>
+                        <span class="score">${safeVerdict}${pct ? ` (${pct}%)` : ''}</span>
+                    </div>
+                    ${explanationHtml}
+                    ${evidenceBlock}
+                    <div class="result-meta">
+                        Model: ${escapeHTML(data.model || 'FreeFactChecker')} · ${metaLine}
+                    </div>
+                `;
+            }
+
+            function buildMetaLine(query, meta = {}) {
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (meta.source === 'url' && meta.url) {
+                    const note = meta.note ? ` (${escapeHTML(meta.note)})` : '';
+                    return `Fetched from <a href="${encodeURI(meta.url)}" target="_blank" rel="noopener">${escapeHTML(meta.url)}</a>${note} · ${time}`;
+                }
+                return `Input: ${escapeHTML(query)} · ${time}`;
+            }
+
+            function handleFetchError(err) {
+                const message = err?.message || 'Unknown error';
+                if (message.includes('site blocked automated access')) {
+                    return 'The site blocked automated access. Try another link or copy the article text.';
+                }
+                if (message.includes('Failed to fetch URL') || message.includes('Could not extract readable text')) {
+                    return 'We could not read that page. Try another link or paste the text directly.';
+                }
+                return message;
+            }
+    </script>
+</body>
+</html>
+

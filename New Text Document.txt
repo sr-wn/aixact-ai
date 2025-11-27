@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aixact AI – Detect, Verify, Trust</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+    }
+
+    body {
+        background: #1d1d1f;
+        color: #000;
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .frame {
+        background: #000;
+        padding: 40px;
+        width: 100%;
+        max-width: 1200px;
+        border-radius: 10px;
+    }
+
+    .content-wrapper {
+        background: #e5e5e5;
+        padding: 40px;
+        border-radius: 6px;
+    }
+
+    /* Sidebar + main layout */
+    .layout {
+        display: flex;
+        gap: 40px;
+    }
+
+    .sidebar {
+        width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding-top: 10px;
+        font-size: 14px;
+    }
+
+    .sidebar a {
+        text-decoration: none;
+        color: #000;
+        opacity: 0.8;
+        transition: 0.2s;
+    }
+
+    .sidebar a:hover {
+        opacity: 1;
+    }
+
+    /* Hero Section */
+    .hero {
+        flex: 1;
+    }
+
+    .top-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-bottom: 40px;
+    }
+
+    .top-buttons button {
+        padding: 10px 18px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .login-btn {
+        background: #d1d1d1;
+    }
+
+    .signin-btn {
+        background: #fff;
+    }
+
+    h1 {
+        font-size: 70px;
+        line-height: 70px;
+        font-weight: 900;
+    }
+
+    .subtitle {
+        max-width: 420px;
+        margin-top: 20px;
+        opacity: 0.7;
+        font-size: 14px;
+    }
+
+    .get-started {
+        margin-top: 40px;
+        background: #000;
+        color: #fff;
+        padding: 18px 34px;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    /* Features Section */
+    .features {
+        margin-top: 50px;
+        border-top: 1px solid #000;
+        padding-top: 40px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .feature {
+        width: 22%;
+    }
+
+    .feature-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .feature-desc {
+        font-size: 13px;
+        opacity: 0.7;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="frame">
+    <div class="content-wrapper">
+
+        <div class="layout">
+            
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <a>Aixact AI</a>
+                <a href="#">Dashboard</a>
+                <a href="#">Sources</a>
+                <a href="#">Upload</a>
+                <a href="#">Reports</a>
+                <a href="#">Integrations</a>
+            </div>
+
+            <!-- MAIN SECTION -->
+            <div class="hero">
+
+                <!-- Top Buttons -->
+                <div class="top-buttons">
+                    <button class="login-btn">Log in</button>
+                    <button class="signin-btn">Sign in</button>
+                </div>
+
+                <!-- Hero Text -->
+                <h1>Detect,<br>Verify,<br>Trust</h1>
+                <p class="subtitle">
+                    Aixact AI analyzes any text, document, or link and detects misinformation instantly — giving you trustworthy, evidence-based clarity.
+                </p>
+
+                <button class="get-started">Get Started</button>
+
+                <!-- Features -->
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-title">Real-Time Fact Checking</div>
+                        <div class="feature-desc">AI-powered detection of false or misleading claims.</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-title">Source Reliability Scoring</div>
+                        <div class="feature-desc">Evaluates trustworthiness of authors and publishers.</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-title">Multi-Format Analysis</div>
+                        <div class="feature-desc">Supports PDFs, images, articles, videos, and posts.</div>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-title">Misinformation Alerts</div>
+                        <div class="feature-desc">Flags risky content and shows verified corrections.</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Small JS hover animation example
+    document.querySelector(".get-started").addEventListener("mouseover", () => {
+        document.querySelector(".get-started").style.transform = "scale(1.05)";
+        document.querySelector(".get-started").style.transition = "0.2s";
+    });
+
+    document.querySelector(".get-started").addEventListener("mouseout", () => {
+        document.querySelector(".get-started").style.transform = "scale(1)";
+    });
+</script>
+
+</body>
+</html>
