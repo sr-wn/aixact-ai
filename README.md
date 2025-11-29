@@ -72,5 +72,7 @@ It exposes HTTP APIs to analyze user-submitted claims using a custom Free Fact C
 2. Install dependencies.
 
 Authors: Srawan Pandey , Shreya Srivastava.
+
 Email: srawanp14@gmail.com , shreyasrivastava090807@gmail.com.
+
 Project: Aixact AI – Detect. Verify. Trust.
